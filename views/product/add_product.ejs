@@ -1,0 +1,24 @@
+<%- include('../layout/header') %>
+
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">Add New Product</h2>
+        <form action="/addProduct" method="post" id="add-form"class="custom-form">
+            <div class="form-group">
+                <label for="product_Name">Name</label>
+                <input type="text" name="product_Name" class="form-control custom-input" id="product_Name" placeholder="Enter name" required>
+            </div>
+            <div class="form-group">
+                <label for="product_information">Information</label>
+                <textarea class="form-control" id="product_information" name="product_information" rows="5" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="product_image">Image URI</label>
+                <input type="text" name="product_image" class="form-control custom-input" id="product_image" placeholder="Enter image URI" required>
+            </div>
+            <button type="submit" class="btn btn-primary custom-button">Add Product</button>
+        </form>
+        
+    </div>
+
+
+    <%- include('../layout/footer') %>

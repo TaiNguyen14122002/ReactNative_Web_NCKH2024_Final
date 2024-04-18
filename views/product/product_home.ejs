@@ -1,0 +1,65 @@
+<div class="container text-center">
+    <h2>This is PRODUCT HOME</h2>
+</div>
+<div class="container">
+    <a href="/addProduct" class="btn btn-info" style="margin-left: 24px;">Add product</a>
+</div>
+
+<div class="container">
+    <div class="row my-4">
+        <div class="col-lg-12">
+            <% if (message) { %>
+                <div class="alert alert-dismissible fade show alert-<%= message.type %>" role="alert">
+                    <button class="btn-close" type="button" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <strong>
+                        <%= message.message %>
+                    </strong>
+                </div>
+                <% } %>
+                    <div class="table-responsive mx-4">
+
+                        <% if (products !='' ) { %>
+                            <table id="dataTable" class="table table-striped text-center">
+                                <br>
+                                <thead>
+                                    <tr class="table-dark">
+                                        <th>ID</th>
+                                        <th>Images</th>
+                                        <th>Name</th>
+                                        <th>Information</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% products.forEach((row, index)=> { %>
+                                        <tr class="align-middle">
+                                            <td>
+                                                <%= index %>
+                                            </td>
+                                            <td><img src="<%= row.product_image %>" width="80" class="img-thumbnail" /></td>
+                                            <td>
+                                                <%= row.product_Name %>
+                                            </td>
+                                            <td>
+                                                <%= row.product_information %>
+                                            </td>
+                                            <td>
+
+
+                                                <a href="/edit/product/<%= row._id %>" class="text-success"><i
+                                                        class="fas fa-edit fa-lg mx-1"></i></a>
+                                                <a href="/delete/product/<%= row._id %>" class="text-danger"><i
+                                                        class="fas fa-trash fa-lg mx-1"></i></a>
+                                            </td>
+                                        </tr>
+                                        <% }); %>
+                                </tbody>
+                            </table>
+
+                            <% } else { %>
+                                <h1 class="text-center text-secondary mt-5"> No product in the database</h1>
+                                <% } %>
+                    </div>
+        </div>
+    </div>
+</div>

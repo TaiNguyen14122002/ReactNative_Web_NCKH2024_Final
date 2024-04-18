@@ -44,18 +44,7 @@
             rows[i].style.display = foundMatch ? '' : 'none';
         }
     });
-    phoneInput.addEventListener('input', function () {
-        const phoneNumber = this.value;
-        const validPhoneNumber = /^[6-9]\d{9}$/;
-
-        if (validPhoneNumber.test(phoneNumber)) {
-            phoneError.textContent = '';
-            phoneInput.setCustomValidity('');
-        } else {
-            phoneError.textContent = 'Please enter a valid phone number starting with 6, 7, 8, or 9';
-            phoneInput.setCustomValidity('Invalid phone number'); 
-        }
-    });
+    
 </script>
 
 </body>

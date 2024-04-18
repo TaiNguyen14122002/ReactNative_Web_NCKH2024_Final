@@ -1,0 +1,38 @@
+<%- include('../layout/header') %>
+
+
+    <div class="container mt-5 ">
+        <h2 class="text-center mb-4">Edit Product (<%= products.product_Name %>)</h2>
+        <div class="edit-user-container">
+
+            <form action="/update/product/<%= products._id %>" method="post" id="add-form" class="custom-form">
+                <div class="form-group">
+                    <label for="product_Name">Name</label>
+                    <input type="text" name="product_Name" class="form-control custom-input" id="product_Name" value="<%= products.product_Name %>"
+                        placeholder="Enter name" required>
+                </div>
+                <div class="form-group">
+                    <label for="product_information">Information</label>
+                    <textarea name="product_information" class="form-control " rows="5"
+                        id="product_information" placeholder="Enter info" required ><%= products.product_information %></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="product_image">Image URI</label>
+                    <input type="text" value="<%= products.product_image %>" name="product_image" class="form-control custom-input"
+                        id="product_image" placeholder="Enter URI" required>
+                </div>
+                <div class="form-group">
+                    <img src="<%= products.product_image %>" width="200" class="img-thumbnail" />
+                </div>
+                
+                <button type="submit" class="btn btn-success btn-lg custom-button">Edit Product</button>
+            </form>
+        </div> 
+    </div>
+
+    <%- include('../layout/footer') %>
+        <style>
+            .container .text-center {
+                color: rgb(0, 0, 0);
+            }
+        </style>

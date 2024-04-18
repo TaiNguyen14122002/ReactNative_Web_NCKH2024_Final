@@ -1,29 +1,19 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/users");
-const multer = require("multer");
-const fs = require("fs");
 const mongoose = require("mongoose");
+const Product = require("../models/products");
+const Order = require("../models/order");
 const ObjectId = mongoose.Types.ObjectId;
 
-// Configure multer for file upload the logic goes here for the file upload
-const storage = multer.diskStorage({
-  destination: "./uploads",
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, file.fieldname + "_" + uniqueSuffix + "_" + file.originalname);
-  },
-});
-const upload = multer({ storage }).single("image");
 
 // Route for adding a user to the database
-router.post("/add", upload, async (req, res) => {
+router.post("/add", async (req, res) => {
   try {
     const user = new User({
       name: req.body.name,
       email: req.body.email,
       phone: req.body.phone,
-      image: req.file.filename,
     });
     await user.save();
     req.session.message = {
@@ -40,24 +30,114 @@ router.post("/add", upload, async (req, res) => {
     res.status(500).redirect("/");
   }
 });
+// Route for adding a product to the database
+router.post("/addProduct", async (req, res) => {
+  try {
+    const products = new Product({
+      product_Name: req.body.product_Name,
+      product_information: req.body.product_information,
+      product_image: req.body.product_image,
+    });
+    await products.save();
+    req.session.message = {
+      type: "success",
+      message: "Product added successfully",
+    };
+    res.redirect("/product");
+  } catch (err) {
+    console.error(err);
+    req.session.message = {
+      type: "danger",
+      message: "Failed to add product",
+    };
+    res.status(500).redirect("/product");
+  }
+});
+
 
 // Route for rendering the index page
 router.get("/", async (req, res) => {
   try {
-    const users = await User.find().exec(); // Fetch users from the database
-    const message = req.session.message; // Retrieve the message from the session
-    delete req.session.message; // Remove the message from the session
-
     res.render("index", {
       title: "Home Page",
-      users: users, // Pass the users data to the view
-      message: message, // Pass the message to the view
+      page: "home",
     });
   } catch (err) {
     console.error(err);
     req.session.message = {
       type: "danger",
       message: "Failed to fetch users",
+    };
+    res.redirect("/");
+  }
+});
+
+// Route for rendering the user home page
+router.get("/user", async (req, res) => {
+  try {
+    const users = await User.find().exec(); // Fetch users from the database
+    const message = req.session.message; // Retrieve the message from the session
+    delete req.session.message; // Remove the message from the session
+
+    res.render("index", {
+      title: "User Page",
+      page: "user",
+      users: users, // Pass the users data to the view
+      message: message, // Pass the message to the view
+    });
+    // Your logic for rendering the user home page
+  } catch (err) {
+    console.error(err);
+    req.session.message = {
+      type: "danger",
+      message: "Failed to render user home",
+    };
+    res.redirect("/");
+  }
+});
+router.get("/product", async (req, res) => {
+  try {
+    const products = await Product.find().exec(); // Fetch users from the database
+    const message = req.session.message; // Retrieve the message from the session
+    delete req.session.message; // Remove the message from the session
+
+    res.render("index", {
+      title: "Product Page",
+      page: "product",
+      products: products, // Pass the users data to the view
+      message: message, // Pass the message to the view
+    });
+    // Your logic for rendering the user home page
+  } catch (err) {
+    console.error(err);
+    req.session.message = {
+      type: "danger",
+      message: "Failed to render user home",
+    };
+    res.redirect("/");
+  }
+});
+
+//Route to render order details
+router.get("/order", async (req, res) => {
+  try {
+    const order = await Order.find().populate('user').exec();
+
+    const message = req.session.message; // Retrieve the message from the session
+    delete req.session.message; // Remove the message from the session
+    // }
+    res.render("index", {
+      title: "Order Page",
+      page: "order",
+      order: order, // Pass the users data to the view
+      message: message, // Pass the message to the view
+    });
+    // Your logic for rendering the user home page
+  } catch (err) {
+    console.error(err);
+    req.session.message = {
+      type: "danger",
+      message: "Failed to render user home",
     };
     res.redirect("/");
   }
@@ -82,9 +162,62 @@ router.get("/edit/:id", async (req, res) => {
     res.redirect("/");
   }
 });
-router.post("/update/:id", upload, async (req, res) => {
+
+// Edit a user route
+router.get("/edit/product/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const products = await Product.findById(id).exec();
+
+    if (!products) {
+      return res.redirect("/product");
+    }
+
+    res.render("product/edit_product", {
+      title: "Edit product",
+      products: products,
+    });
+  } catch (err) {
+    console.error(err);
+    res.redirect("/product");
+  }
+});
+
+router.post("/update/product/:id", async (req, res) => {
   const id = req.params.id;
-  const newImage = req.file ? req.file.filename : req.body.old_image;
+
+  try {
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      {
+        product_Name: req.body.product_Name,
+        product_image: req.body.product_image,
+        product_information: req.body.product_information,
+      },
+      { new: true }
+    );
+
+    if (!updatedProduct) {
+      throw new Error("User not found");
+    }
+ 
+    req.session.message = {
+      type: "success",
+      message: "Product updated successfully",
+    };
+    res.redirect("/product");    
+  } catch (err) {
+    console.error(err);
+    req.session.message = {
+      type: "danger",
+      message: err.message,
+    };
+    res.redirect("/product");
+  }
+});
+
+router.post("/update/:id", async (req, res) => {
+  const id = req.params.id;
 
   try {
     const updatedUser = await User.findByIdAndUpdate(
@@ -93,22 +226,12 @@ router.post("/update/:id", upload, async (req, res) => {
         name: req.body.name,
         email: req.body.email,
         phone: req.body.phone,
-        image: newImage,
       },
       { new: true }
     );
 
     if (!updatedUser) {
       throw new Error("User not found");
-    }
-
-    // Remove the previous image file if a new image was uploaded
-    if (req.file) {
-      try {
-        fs.unlinkSync(`./uploads/${req.body.old_image}`);
-      } catch (err) {
-        console.log(err);
-      }
     }
  
     req.session.message = {
@@ -126,20 +249,31 @@ router.post("/update/:id", upload, async (req, res) => {
   }
 });
 
+router.get("/edit/order/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const order = await Order.findById(id).populate('user').exec();
+
+    if (!order) {
+      return res.redirect("/order");
+    }
+
+    res.render("order/edit_order", {
+      title: "Edit product",
+      order: order,
+    });
+  } catch (err) {
+    console.error(err);
+    res.redirect("/product");
+  }
+});
+
 // Delete user route functionality goes here
 router.get("/delete/:id", (req, res) => {
   let id = req.params.id;
   User.findOneAndDelete({ _id: id })
     .exec()
     .then((result) => {
-      if (result && result.image !== "") {
-        try {
-          fs.unlinkSync("./uploads/" + result.image);
-          console.log("Image deleted:", result.image);
-        } catch (err) {
-          console.log("Error deleting image:", err);
-        }  
-      }
 
       req.session.message = {
         type: "danger",
@@ -152,12 +286,35 @@ router.get("/delete/:id", (req, res) => {
       res.json({ message: err.message });
     });
 });
+// Delete user route functionality goes here
+router.get("/delete/product/:id", (req, res) => {
+  let id = req.params.id;
+  Product.findOneAndDelete({ _id: id })
+    .exec()
+    .then((result) => {
+
+      req.session.message = {
+        type: "danger",
+        message: "User deleted successfully",
+      };
+
+      res.redirect("/product");
+    })
+    .catch((err) => {
+      res.json({ message: err.message });
+    });
+});
 
 // Route for rendering the add_users page
 router.get("/add", (req, res) => {
   res.render("add_users", {
     title: "User Page",
   });
+});
+
+// Route for rendering the add product page
+router.get("/addProduct", (req, res) => {
+  res.render("product/add_product", { title: "Add Product" });
 });
 
 module.exports = router;

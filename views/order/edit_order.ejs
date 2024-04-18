@@ -1,0 +1,108 @@
+<%- include('../layout/header') %>
+
+
+<div class="container px-3 my-5 clearfix">
+  <!-- Shopping cart table -->
+  <div class="card">
+      <div class="card-header">
+          <h2>Giỏ hàng của <%-order.user.name %></h2>
+      </div>
+      <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered m-0">
+              <thead>
+                <tr>
+                  <!-- Set columns width -->
+                  <th class="text-center py-3 px-4" style="width: 300px;">Tên vé &amp; Mô tả</th>
+                  <th class="text-right py-3 px-4" style="width: 100px;">Giá</th>
+                  <th class="text-center py-3 px-4" style="width: 120px;">Số lượng</th>
+                  <th class="text-right py-3 px-4" style="width: 100px;">Tổng</th>
+                  <th class="text-right py-3 px-4" style="width: 100px;">Hình thức thanh toán</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% order.cartItems.forEach((item, index) => { %>
+                <tr>
+                  <td class="p-4">
+                    <div class="d-flex flex-row align-items-center">
+                      <div>
+                        <!-- Display item image here -->
+                        <!-- Replace the image source with the actual image URL -->
+                        <img src="https://halotravel.vn/wp-content/uploads/2020/11/bao-tang-dan-toc-hoc-viet-nam-8.jpg" class="img-fluid rounded-3" alt="Shopping item" style="width: 65px;">
+                      </div>
+                      <div class="ms-3">
+                        <h5><%= item.ticket_Name %></h5>
+                        <p class="small mb-0"><%= item.Note %></p>
+                      </div>
+                    </div>
+                    </div>
+                  </td>
+                  <td class="text-right font-weight-semibold align-middle p-4"><%= item.Price %> VNĐ</td>
+                  <td class="align-middle p-4"><input type="text" class="form-control text-center" readonly value=<%= item.quantity %>></td>
+                  <td class="text-right font-weight-semibold align-middle p-4"><%= item.Price * item.quantity %> VNĐ</td>
+                  <td class="text-right font-weight-semibold align-middle p-4">
+                    <% if (order.paymentMethod === "cash") { %>
+                        Chuyển khoản <!-- Display this if payment method is "cash" -->
+                    <% } else { %>
+                        Tiền mặt <!-- Display this if payment method is not "cash" -->
+                    <% } %>
+                </td>
+                
+                
+                </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+          <!-- / Shopping cart table -->
+      
+          <div class="d-flex flex-wrap justify-content-between align-items-center pb-4">
+            <div class="mt-4">
+              <label class="text-muted font-weight-normal">Mã giảm giá</label>
+              <input type="text" placeholder="ABC" class="form-control">
+            </div>
+            <div class="d-flex">
+              <div class="text-right mt-4 mr-4" style="padding-right: 50px;">
+                <label class="text-muted font-weight-normal m-0">Giảm giá</label>
+                <div class="text-large"><strong>0 VNĐ</strong></div>
+              </div>
+              <div class="text-right mt-4">
+                <label class="text-muted font-weight-normal m-0">Tổng giá</label>
+                <div class="text-large"><strong><%- order.totalPrice%> VNĐ</strong></div>
+              </div>
+            </div>
+          </div>
+      
+        </div>
+    </div>
+</div>
+
+        <style>
+            .container .text-center {
+                color: rgb(0, 0, 0);
+            }
+            body{
+    margin-top:20px;
+    background:#eee;
+}
+.ui-w-40 {
+    width: 40px !important;
+    height: auto;
+}
+
+.card{
+    box-shadow: 0 1px 15px 1px rgba(52,40,104,.08);    
+}
+
+.ui-product-color {
+    display: inline-block;
+    overflow: hidden;
+    margin: .144em;
+    width: .875rem;
+    height: .875rem;
+    border-radius: 10rem;
+    -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.15) inset;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.15) inset;
+    vertical-align: middle;
+}
+        </style>
