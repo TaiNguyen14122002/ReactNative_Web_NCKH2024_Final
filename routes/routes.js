@@ -4,6 +4,7 @@ const User = require("../models/users");
 const mongoose = require("mongoose");
 const Product = require("../models/products");
 const Order = require("../models/order");
+const Admin = require("../models/admin");
 const ObjectId = mongoose.Types.ObjectId;
 
 
@@ -58,9 +59,57 @@ router.post("/addProduct", async (req, res) => {
 // Route for rendering the index page
 router.get("/", async (req, res) => {
   try {
+    res.render("login", {
+        title: "Home Page",
+        page: "login",
+    });
+  } catch (err) {
+    console.error(err);
+    req.session.message = {
+      type: "danger",
+      message: "Failed to fetch users",
+    };
+    res.redirect("/");
+  }
+});
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  const error = req.query.error;
+  try {
+      // Find admin by email
+      const admin = await Admin.findOne({ email });
+
+      if (!admin) {
+          // If admin not found, redirect to login page with error message
+          return res.render('login', { title: 'Login', error });
+      }
+
+      // Compare passwords
+      if (password === admin.password) {
+          // Passwords match, redirect to home page
+          res.render('index', {
+              title: 'Home Page',
+              page: 'home',
+          });
+      } else {
+          // Passwords don't match, redirect to login page with error message
+          res.render('login', { title: 'Login', error });
+      }
+  } catch (err) {
+      console.error(err);
+      // If any error occurs during the process, redirect to login page with a generic error message
+      return res.redirect('/?error=An error occurred while logging in');
+  }
+});
+
+// Route for rendering the index page
+router.get("/home", async (req, res) => {
+
+  try {
+
     res.render("index", {
-      title: "Home Page",
-      page: "home",
+        title: "Home Page",
+        page: "home",
     });
   } catch (err) {
     console.error(err);
